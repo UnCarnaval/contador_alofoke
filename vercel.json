@@ -15,7 +15,7 @@
   "crons": [
     {
       "path": "/api/monitorear",
-      "schedule": "*/30 * * * * *"
+      "schedule": "*/30 * * * *"
     }
   ],
   "env": {
