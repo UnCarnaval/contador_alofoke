@@ -362,7 +362,7 @@ app.get('/api/monitorear', async (req, res) => {
         await monitorearSuperChats();
         res.json({ 
             success: true, 
-            message: 'Monitoreo ejecutado correctamente',
+            message: 'Monitoreo ejecutados correctamente',
             timestamp: getRDTime()
         });
     } catch (error) {
