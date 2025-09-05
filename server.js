@@ -14,20 +14,47 @@ const VIDEO_ID = process.env.VIDEO_ID || "gOJvu0xYsdo";
 // Participantes
 const PARTICIPANTES = ["Crazy", "Crucita", "Gigi", "Luise", "Carlos Montesquieu", "Giuseppe", "Karola"];
 
-// Archivos JSON (usar memoria en Vercel)
-const PUNTOS_FILE = 'puntos.json';
-const EVENTOS_FILE = 'eventos.json';
-const PUNTOS_DIARIOS_FILE = 'puntos_diarios.json';
+// Archivos JSON (usar /tmp en Vercel, local en desarrollo)
+const PUNTOS_FILE = process.env.VERCEL ? '/tmp/puntos.json' : 'puntos.json';
+const EVENTOS_FILE = process.env.VERCEL ? '/tmp/eventos.json' : 'eventos.json';
+const PUNTOS_DIARIOS_FILE = process.env.VERCEL ? '/tmp/puntos_diarios.json' : 'puntos_diarios.json';
 
-// Inicializar datos en memoria
+// Inicializar archivos JSON
 function initFiles() {
-    // Siempre usar memoria en Vercel
-    global.puntosData = global.puntosData || {};
-    global.eventosData = global.eventosData || [];
-    global.puntosDiariosData = global.puntosDiariosData || {};
-    
-    // Inicializar puntos si están vacíos
-    if (Object.keys(global.puntosData).length === 0) {
+    try {
+        // Crear directorio /tmp si estamos en Vercel
+        if (process.env.VERCEL && !fs.existsSync('/tmp')) {
+            fs.mkdirSync('/tmp', { recursive: true });
+        }
+        
+        // Inicializar puntos.json
+        if (!fs.existsSync(PUNTOS_FILE)) {
+            const puntos = {};
+            PARTICIPANTES.forEach(p => puntos[p] = 0);
+            fs.writeFileSync(PUNTOS_FILE, JSON.stringify(puntos, null, 2));
+            console.log(`✅ Creado ${PUNTOS_FILE}`);
+        }
+        
+        // Inicializar eventos.json
+        if (!fs.existsSync(EVENTOS_FILE)) {
+            fs.writeFileSync(EVENTOS_FILE, JSON.stringify([], null, 2));
+            console.log(`✅ Creado ${EVENTOS_FILE}`);
+        }
+        
+        // Inicializar puntos_diarios.json
+        if (!fs.existsSync(PUNTOS_DIARIOS_FILE)) {
+            fs.writeFileSync(PUNTOS_DIARIOS_FILE, JSON.stringify({}, null, 2));
+            console.log(`✅ Creado ${PUNTOS_DIARIOS_FILE}`);
+        }
+        
+        console.log(`📁 Archivos JSON inicializados correctamente`);
+        
+    } catch (error) {
+        console.error('❌ Error inicializando archivos:', error.message);
+        // Fallback a memoria si hay error
+        global.puntosData = global.puntosData || {};
+        global.eventosData = global.eventosData || [];
+        global.puntosDiariosData = global.puntosDiariosData || {};
         PARTICIPANTES.forEach(p => global.puntosData[p] = 0);
     }
 }
@@ -39,28 +66,67 @@ function getRDTime() {
     return rdTime.toISOString().replace('T', ' ').substring(0, 19);
 }
 
-// Cargar datos (solo memoria)
+// Cargar datos
 function loadData(filename) {
-    if (filename === PUNTOS_FILE) {
-        return global.puntosData || {};
-    } else if (filename === EVENTOS_FILE) {
-        return global.eventosData || [];
-    } else if (filename === PUNTOS_DIARIOS_FILE) {
-        return global.puntosDiariosData || {};
+    try {
+        if (fs.existsSync(filename)) {
+            const data = fs.readFileSync(filename, 'utf8');
+            return JSON.parse(data);
+        } else {
+            // Si no existe el archivo, usar datos en memoria como fallback
+            if (filename === PUNTOS_FILE) {
+                return global.puntosData || {};
+            } else if (filename === EVENTOS_FILE) {
+                return global.eventosData || [];
+            } else if (filename === PUNTOS_DIARIOS_FILE) {
+                return global.puntosDiariosData || {};
+            }
+            return filename === PUNTOS_FILE ? {} : [];
+        }
+    } catch (error) {
+        console.error(`❌ Error cargando ${filename}:`, error.message);
+        // Usar datos en memoria como fallback
+        if (filename === PUNTOS_FILE) {
+            return global.puntosData || {};
+        } else if (filename === EVENTOS_FILE) {
+            return global.eventosData || [];
+        } else if (filename === PUNTOS_DIARIOS_FILE) {
+            return global.puntosDiariosData || {};
+        }
+        return filename === PUNTOS_FILE ? {} : [];
     }
-    return filename === PUNTOS_FILE ? {} : [];
 }
 
-// Guardar datos (solo memoria)
+// Guardar datos
 function saveData(filename, data) {
-    if (filename === PUNTOS_FILE) {
-        global.puntosData = data;
-    } else if (filename === EVENTOS_FILE) {
-        global.eventosData = data;
-    } else if (filename === PUNTOS_DIARIOS_FILE) {
-        global.puntosDiariosData = data;
+    try {
+        // Guardar en archivo
+        fs.writeFileSync(filename, JSON.stringify(data, null, 2));
+        
+        // También guardar en memoria como backup
+        if (filename === PUNTOS_FILE) {
+            global.puntosData = data;
+        } else if (filename === EVENTOS_FILE) {
+            global.eventosData = data;
+        } else if (filename === PUNTOS_DIARIOS_FILE) {
+            global.puntosDiariosData = data;
+        }
+        
+        return true;
+    } catch (error) {
+        console.error(`❌ Error guardando ${filename}:`, error.message);
+        
+        // Fallback: guardar solo en memoria
+        if (filename === PUNTOS_FILE) {
+            global.puntosData = data;
+        } else if (filename === EVENTOS_FILE) {
+            global.eventosData = data;
+        } else if (filename === PUNTOS_DIARIOS_FILE) {
+            global.puntosDiariosData = data;
+        }
+        
+        return true; // Retornar true porque guardamos en memoria
     }
-    return true;
 }
 
 // Extraer puntos del monto
@@ -276,6 +342,38 @@ async function monitorearSuperChats() {
 // Middleware
 app.use(express.json());
 app.use(express.static('public'));
+
+// API para obtener datos
+app.get('/api/datos', (req, res) => {
+    const puntos = loadData(PUNTOS_FILE);
+    const eventos = loadData(EVENTOS_FILE);
+    const puntosDiarios = loadData(PUNTOS_DIARIOS_FILE);
+    
+    res.json({
+        puntos,
+        eventos: eventos.slice(0, 20), // Solo los últimos 20 eventos
+        puntos_diarios: puntosDiarios
+    });
+});
+
+// API para monitorear manualmente (útil para Vercel cron)
+app.get('/api/monitorear', async (req, res) => {
+    try {
+        await monitorearSuperChats();
+        res.json({ 
+            success: true, 
+            message: 'Monitoreo ejecutado correctamente',
+            timestamp: getRDTime()
+        });
+    } catch (error) {
+        console.error('Error en monitoreo manual:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error en monitoreo',
+            error: error.message 
+        });
+    }
+});
 
 // Ruta principal
 app.get('/', (req, res) => {
