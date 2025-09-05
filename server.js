@@ -83,83 +83,87 @@ function extraerPuntos(amountStr) {
     }
 }
 
-// Encontrar persona en el mensaje
-function encontrarPersona(message) {
+// Detectar múltiples personas mencionadas en el mensaje
+function detectarPersonasMencionadas(message) {
+    const personasEncontradas = [];
     const messageLower = message.toLowerCase();
     
-    // Gigi
-    if (messageLower.includes('gigi') || messageLower.includes('team gigi') || 
-        messageLower.includes('#teamgigi') || messageLower.includes('teamgigi')) {
-        return 'Gigi';
-    }
+    // Buscar menciones de cada participante
+    PARTICIPANTES.forEach(participante => {
+        const nombreLower = participante.toLowerCase();
+        
+        // Buscar el nombre completo
+        if (messageLower.includes(nombreLower)) {
+            personasEncontradas.push(participante);
+        }
+        
+        // Buscar variantes específicas
+        const variantes = {
+            'Crazy': ['crazy', 'design'],
+            'Crucita': ['crucita', 'crusita', 'team crucita', 'team crusita', '#teamcrucita', 'teamcrucita'],
+            'Gigi': ['gigi', 'team gigi', '#teamgigi', 'teamgigi'],
+            'Luise': ['luise', 'luice', 'ñaño', 'nano'],
+            'Carlos Montesquieu': ['carlos', 'montesquieu', 'saltamonte'],
+            'Giuseppe': ['giuseppe', 'trujillo'],
+            'Karola': ['karola', 'carola', 'karol', '#teamkarola', 'team karola']
+        };
+        
+        if (variantes[participante]) {
+            variantes[participante].forEach(variante => {
+                if (messageLower.includes(variante) && !personasEncontradas.includes(participante)) {
+                    personasEncontradas.push(participante);
+                }
+            });
+        }
+    });
     
-    // Crucita
-    if (messageLower.includes('crucita') || messageLower.includes('crusita') || 
-        messageLower.includes('team crucita') || messageLower.includes('team crusita') ||
-        messageLower.includes('#teamcrucita') || messageLower.includes('teamcrucita')) {
-        return 'Crucita';
-    }
-    
-    // Luise
-    if (messageLower.includes('luise') || messageLower.includes('luice') || 
-        messageLower.includes('ñaño') || messageLower.includes('nano')) {
-        return 'Luise';
-    }
-    
-    // Carlos
-    if (messageLower.includes('carlos') || messageLower.includes('montesquieu') || 
-        messageLower.includes('saltamonte')) {
-        return 'Carlos Montesquieu';
-    }
-    
-    // Giuseppe
-    if (messageLower.includes('giuseppe') || messageLower.includes('trujillo')) {
-        return 'Giuseppe';
-    }
-    
-    // Crazy
-    if (messageLower.includes('crazy') || messageLower.includes('design')) {
-        return 'Crazy';
-    }
-    
-    // Karola
-    if (messageLower.includes('karola') || messageLower.includes('carola') || 
-        messageLower.includes('karol') || messageLower.includes('#teamkarola') ||
-        messageLower.includes('team karola')) {
-        return 'Karola';
-    }
-    
-    return null;
+    return personasEncontradas;
+}
+
+// Encontrar persona en el mensaje (función original para compatibilidad)
+function encontrarPersona(message) {
+    const personas = detectarPersonasMencionadas(message);
+    return personas.length > 0 ? personas[0] : null;
 }
 
 // Guardar Super Chat
-function guardarSuperChat(author, amount, message, persona, puntos) {
+function guardarSuperChat(author, amount, message, personas, puntos) {
     const eventos = loadData(EVENTOS_FILE);
     const puntosData = loadData(PUNTOS_FILE);
+    
+    // Calcular puntos por persona (dividir entre el número de personas)
+    const puntosPorPersona = Math.round(puntos / personas.length);
     
     // Verificar duplicados
     const existe = eventos.find(e => 
         e.author === author && 
         e.amount === amount && 
-        e.message === message && 
-        e.persona === persona
+        e.message === message
     );
     
     if (existe) return false;
     
-    // Crear nuevo evento
-    const nuevoEvento = {
-        id: eventos.length + 1,
-        author: author,
-        amount: amount,
-        message: message,
-        persona: persona,
-        puntos: puntos,
-        timestamp: getRDTime()
-    };
-    
-    // Agregar evento
-    eventos.push(nuevoEvento);
+    // Crear evento para cada persona mencionada
+    personas.forEach(persona => {
+        const nuevoEvento = {
+            id: eventos.length + 1,
+            author: author,
+            amount: amount,
+            message: message,
+            persona: persona,
+            puntos: puntosPorPersona,
+            timestamp: getRDTime(),
+            personasMencionadas: personas.length > 1 ? personas : undefined
+        };
+        
+        eventos.push(nuevoEvento);
+        
+        // Actualizar puntos
+        puntosData[persona] = (puntosData[persona] || 0) + puntosPorPersona;
+        
+        // Actualizar puntos diarios
+        actualizarPuntosDiarios(persona, puntosPorPersona);
+    });
     
     // Limitar a 1000 eventos
     if (eventos.length > 1000) {
@@ -167,13 +171,10 @@ function guardarSuperChat(author, amount, message, persona, puntos) {
     }
     
     saveData(EVENTOS_FILE, eventos);
-    
-    // Actualizar puntos
-    puntosData[persona] = (puntosData[persona] || 0) + puntos;
     saveData(PUNTOS_FILE, puntosData);
     
-    // Actualizar puntos diarios
-    actualizarPuntosDiarios(persona, puntos);
+    const personasStr = personas.length > 1 ? ` (${personas.join(', ')})` : '';
+    console.log(`✅ Super Chat guardado: ${author} - ${amount} → ${personasStr} (+${puntosPorPersona} puntos c/u)`);
     
     return true;
 }
@@ -244,11 +245,13 @@ async function monitorearSuperChats() {
                 const amount = snippet.superChatDetails?.amountDisplayString || '0';
                 
                 const puntos = extraerPuntos(amount);
-                const persona = encontrarPersona(message);
+                const personas = detectarPersonasMencionadas(message);
                 
-                if (persona && puntos > 0) {
-                    if (guardarSuperChat(author, amount, message, persona, puntos)) {
-                        console.log(`💰 ${persona}: +${puntos} pts (${amount}) - ${author}`);
+                if (personas.length > 0 && puntos > 0) {
+                    if (guardarSuperChat(author, amount, message, personas, puntos)) {
+                        const puntosPorPersona = Math.round(puntos / personas.length);
+                        const personasStr = personas.length > 1 ? ` (${personas.join(', ')})` : '';
+                        console.log(`💰 ${personasStr}: +${puntosPorPersona} pts c/u (${amount}) - ${author}`);
                         
                         // Mostrar ranking
                         const puntosData = loadData(PUNTOS_FILE);
@@ -520,15 +523,20 @@ app.get('/', (req, res) => {
                     
                     // Actualizar eventos
                     const events = document.getElementById('events');
-                    events.innerHTML = data.eventos.map(evento => 
-                        '<div class="event-item">' +
+                    events.innerHTML = data.eventos.map(evento => {
+                        let personaInfo = '→ ' + evento.persona + ' (+' + evento.puntos + ' pts)';
+                        if (evento.personasMencionadas && evento.personasMencionadas.length > 1) {
+                            personaInfo = '→ ' + evento.personasMencionadas.join(', ') + ' (+' + evento.puntos + ' pts c/u)';
+                        }
+                        
+                        return '<div class="event-item">' +
                             '<div class="event-author">' + evento.author + '</div>' +
                             '<div class="event-amount">' + evento.amount + '</div>' +
-                            '<div class="event-persona">→ ' + evento.persona + ' (+' + evento.puntos + ' pts)</div>' +
+                            '<div class="event-persona">' + personaInfo + '</div>' +
                             '<div class="event-message">' + evento.message + '</div>' +
                             '<div class="event-time">' + evento.timestamp + '</div>' +
-                        '</div>'
-                    ).join('');
+                        '</div>';
+                    }).join('');
                     
                     // Actualizar estadísticas
                     const totalPuntos = Object.values(data.puntos).reduce((a, b) => a + b, 0);
