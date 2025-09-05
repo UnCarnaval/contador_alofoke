@@ -16,11 +16,5 @@
     "NODE_ENV": "production",
     "API_KEY": "AIzaSyDCwPogQQkb0JIfWU2H8-l6_0XXyTSaC50",
     "VIDEO_ID": "gOJvu0xYsdo"
-  },
-  "functions": {
-    "server.js": {
-      "maxDuration": 30
-    }
-  },
-  "outputDirectory": "public"
+  }
 }
