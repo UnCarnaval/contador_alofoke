@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm install",
-  "outputDirectory": ".",
+  "outputDirectory": "public",
   "installCommand": "npm install",
   "framework": "nodejs",
   "nodeVersion": "18.x"

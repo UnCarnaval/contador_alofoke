@@ -21,5 +21,6 @@
     "server.js": {
       "maxDuration": 30
     }
-  }
+  },
+  "outputDirectory": "public"
 }

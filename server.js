@@ -14,10 +14,10 @@ const VIDEO_ID = process.env.VIDEO_ID || "gOJvu0xYsdo";
 // Participantes
 const PARTICIPANTES = ["Crazy", "Crucita", "Gigi", "Luise", "Carlos Montesquieu", "Giuseppe", "Karola"];
 
-// Archivos JSON
-const PUNTOS_FILE = 'puntos.json';
-const EVENTOS_FILE = 'eventos.json';
-const PUNTOS_DIARIOS_FILE = 'puntos_diarios.json';
+// Archivos JSON (en carpeta public para Vercel)
+const PUNTOS_FILE = 'public/puntos.json';
+const EVENTOS_FILE = 'public/eventos.json';
+const PUNTOS_DIARIOS_FILE = 'public/puntos_diarios.json';
 
 // Inicializar archivos JSON
 function initFiles() {

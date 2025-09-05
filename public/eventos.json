@@ -1,0 +1,200 @@
+[
+  {
+    "id": 1,
+    "author": "Jenniffer Matias",
+    "amount": "$9.99",
+    "message": "$9.99 from Jenniffer Matias: \"Cristia eres la mejor #teamcrusita #teamcampesina 💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚\"",
+    "persona": "Crucita",
+    "puntos": 10,
+    "timestamp": "2025-09-04 23:45:00"
+  },
+  {
+    "id": 2,
+    "author": "Chrislyn Suazo",
+    "amount": "$4.99",
+    "message": "$4.99 from Chrislyn Suazo: \"Team GIGI💕\"",
+    "persona": "Gigi",
+    "puntos": 5,
+    "timestamp": "2025-09-05 03:45:00"
+  },
+  {
+    "id": 3,
+    "author": "281288wilson",
+    "amount": "$19.99",
+    "message": "$19.99 from 281288wilson: \"TEAM GIGI TE ❤️❤️❤️❤️❤️\"",
+    "persona": "Gigi",
+    "puntos": 20,
+    "timestamp": "2025-09-04 23:45:00"
+  },
+  {
+    "id": 4,
+    "author": "Dee arias",
+    "amount": "$19.99",
+    "message": "$19.99 from Dee arias: \"Team Gigi from NY 💕💗\"",
+    "persona": "Gigi",
+    "puntos": 20,
+    "timestamp": "2025-09-05 03:45:00"
+  },
+  {
+    "id": 5,
+    "author": "Rip_thegoatakira ",
+    "amount": "$100.00",
+    "message": "$100.00 from Rip_thegoatakira : \"team luis\"",
+    "persona": "Luise",
+    "puntos": 100,
+    "timestamp": "2025-09-04 23:45:00"
+  },
+  {
+    "id": 6,
+    "author": "Rip_thegoatakira ",
+    "amount": "$50.00",
+    "message": "$50.00 from Rip_thegoatakira : \"team crucita\"",
+    "persona": "Crucita",
+    "puntos": 50,
+    "timestamp": "2025-09-05 03:45:00"
+  },
+  {
+    "id": 7,
+    "author": "angelijulissa1983",
+    "amount": "NOK 200.00",
+    "message": "NOK 200.00 from angelijulissa1983: \"Para Gigi 💝 admirable tu fortaleza Reina. muchas bendiciones.\"",
+    "persona": "Gigi",
+    "puntos": 200,
+    "timestamp": "2025-09-04 23:45:00"
+  },
+  {
+    "id": 8,
+    "author": "Nati Rodriguez ",
+    "amount": "$399.99",
+    "message": "$399.99 from Nati Rodriguez : \"TEAM GIGI ! YA SABEMOS Q ESE PRIMER LUGAR ESTÁ COMPRADO POR LA GENTE DE LA SANTA VICTIMA. PERO TRANQUILA MI GIGI ,PORQUE DIOS NO PREMIA AL INJUSTO MUCHO MENOS LA MALDADES . PARA TODOS TU YA ERES LA GANADORA ESCOGÍDA NO COMPRADA. DIOS ESTÁ CONTIGO. EN UN MUNDO DE ODIO SE TU LA PRESIÓN 😘\"",
+    "persona": "Gigi",
+    "puntos": 400,
+    "timestamp": "2025-09-05 03:45:00"
+  },
+  {
+    "id": 9,
+    "author": "yumilky feliz",
+    "amount": "$4.99",
+    "message": "$4.99 from yumilky feliz: \"Santiago ya porfavor callate! Pon la tabla! Trabajamos manana! #teamcrusita 💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚💚\"",
+    "persona": "Crucita",
+    "puntos": 5,
+    "timestamp": "2025-09-04 23:46:00"
+  },
+  {
+    "id": 10,
+    "author": "281288wilson",
+    "amount": "$4.99",
+    "message": "$4.99 from 281288wilson: \"TEAM GIGi estás muy Trankila eres la mejor\"",
+    "persona": "Gigi",
+    "puntos": 5,
+    "timestamp": "2025-09-04 23:46:30"
+  },
+  {
+    "id": 11,
+    "author": "Evelyn Baez",
+    "amount": "$1.99",
+    "message": "$1.99 from Evelyn Baez: \"Team crusita la mejor\"",
+    "persona": "Crucita",
+    "puntos": 2,
+    "timestamp": "2025-09-04 23:46:30"
+  },
+  {
+    "id": 12,
+    "author": "Lucero Maribel",
+    "amount": "$9.99",
+    "message": "$9.99 from Lucero Maribel: \"Team Luise\"",
+    "persona": "Luise",
+    "puntos": 10,
+    "timestamp": "2025-09-05 03:47:00"
+  },
+  {
+    "id": 13,
+    "author": "Melanie P. Fernández",
+    "amount": "$1.99",
+    "message": "$1.99 from Melanie P. Fernández: \"Crucita\"",
+    "persona": "Crucita",
+    "puntos": 2,
+    "timestamp": "2025-09-04 23:48:31"
+  },
+  {
+    "id": 14,
+    "author": "Franchesly Hernández",
+    "amount": "$4.99",
+    "message": "$4.99 from Franchesly Hernández: \"Team Karola\"",
+    "persona": "Karola",
+    "puntos": 5,
+    "timestamp": "2025-09-05 03:49:00"
+  },
+  {
+    "id": 15,
+    "author": "Shely Nunez",
+    "amount": "$9.99",
+    "message": "$9.99 from Shely Nunez: \"TEAM CRUSITAAAA 🫶🏼🫶🏼\"",
+    "persona": "Crucita",
+    "puntos": 10,
+    "timestamp": "2025-09-05 03:49:30"
+  },
+  {
+    "id": 16,
+    "author": "Esther Abreu",
+    "amount": "$4.99",
+    "message": "$4.99 from Esther Abreu: \"TEAM CRUSITA 💚\"",
+    "persona": "Crucita",
+    "puntos": 5,
+    "timestamp": "2025-09-05 03:50:01"
+  },
+  {
+    "id": 17,
+    "author": "Valeryn",
+    "amount": "$1.99",
+    "message": "$1.99 from Valeryn: \"💚💚💚💚💚💚 SEGUIMOS #1 CRUCITAAAAAA\"",
+    "persona": "Crucita",
+    "puntos": 2,
+    "timestamp": "2025-09-05 03:50:01"
+  },
+  {
+    "id": 18,
+    "author": "281288wilson",
+    "amount": "$4.99",
+    "message": "$4.99 from 281288wilson: \"TEAM GIGi prende la candela 🔥🔥🔥🔥\"",
+    "persona": "Gigi",
+    "puntos": 5,
+    "timestamp": "2025-09-05 03:51:00"
+  },
+  {
+    "id": 19,
+    "author": "angelijulissa1983",
+    "amount": "NOK 100.00",
+    "message": "NOK 100.00 from angelijulissa1983: \"Devuelvan los 6000 puntos a Gigi 💕 porque otros los han hecho peor y no le hacen nada solo a Gigi.\"",
+    "persona": "Gigi",
+    "puntos": 100,
+    "timestamp": "2025-09-05 03:51:00"
+  },
+  {
+    "id": 20,
+    "author": "Liz",
+    "amount": "$19.99",
+    "message": "$19.99 from Liz: \"CRUSITA sube esa cabeza en alto y no dejes q nadie apague tu brillo Tienes un grupo q te respalda y estamos muy orgullosos d ti Disfruta tus días y no le prestes atención al bugarrón d la casa que ese no da ni para tu sombra\"",
+    "persona": "Crucita",
+    "puntos": 20,
+    "timestamp": "2025-09-05 03:51:30"
+  },
+  {
+    "id": 21,
+    "author": "Dahiana Escoto",
+    "amount": "$4.99",
+    "message": "$4.99 from Dahiana Escoto: \"Crusita\"",
+    "persona": "Crucita",
+    "puntos": 5,
+    "timestamp": "2025-09-05 03:51:30"
+  },
+  {
+    "id": 22,
+    "author": "Rochelle",
+    "amount": "$9.99",
+    "message": "$9.99 from Rochelle: \"#TEAMCRUSITA NO PODEMOS BAJARLE💚💚💚💚🫡🫡🫡🔥🔥🔥🔥\"",
+    "persona": "Crucita",
+    "puntos": 10,
+    "timestamp": "2025-09-05 03:52:00"
+  }
+]
