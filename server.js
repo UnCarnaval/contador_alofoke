@@ -407,6 +407,55 @@ app.get('/', (req, res) => {
                 color: #888;
                 font-size: 0.8rem;
             }
+            .daily-table {
+                background: rgba(0, 0, 0, 0.3);
+                border: 2px solid #ffd700;
+                border-radius: 15px;
+                padding: 20px;
+                margin-top: 20px;
+            }
+            .daily-table h2 {
+                text-align: center;
+                color: #ffd700;
+                margin-bottom: 20px;
+            }
+            .table-container {
+                overflow-x: auto;
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 10px;
+                padding: 10px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.9rem;
+            }
+            th, td {
+                padding: 8px 12px;
+                text-align: center;
+                border: 1px solid rgba(255, 215, 0, 0.3);
+            }
+            th {
+                background: rgba(255, 215, 0, 0.2);
+                color: #ffd700;
+                font-weight: bold;
+            }
+            td {
+                color: #cccccc;
+            }
+            .date-cell {
+                color: #00d4ff;
+                font-weight: bold;
+            }
+            .points-cell {
+                color: #00ff88;
+                font-weight: bold;
+            }
+            .total-cell {
+                color: #ff6b6b;
+                font-weight: bold;
+                background: rgba(255, 107, 107, 0.1);
+            }
             .loading {
                 text-align: center;
                 font-size: 1.2rem;
@@ -446,6 +495,11 @@ app.get('/', (req, res) => {
                 <h2>🔥 EVENTOS RECIENTES</h2>
                 <div id="events" class="loading">Cargando eventos...</div>
             </div>
+            
+            <div class="daily-table">
+                <h2>📅 PUNTOS POR DÍA (Últimos 30 días)</h2>
+                <div id="dailyTable" class="loading">Cargando tabla diaria...</div>
+            </div>
         </div>
         
         <script>
@@ -458,35 +512,87 @@ app.get('/', (req, res) => {
                     const ranking = document.getElementById('ranking');
                     const sorted = Object.entries(data.puntos).sort((a, b) => b[1] - a[1]);
                     
-                    ranking.innerHTML = sorted.map(([persona, puntos], i) => \`
-                        <div class="ranking-item">
-                            <span class="ranking-position">\${i + 1}.</span>
-                            <span class="ranking-name">\${persona}</span>
-                            <span class="ranking-points">\${puntos} pts</span>
-                        </div>
-                    \`).join('');
+                    ranking.innerHTML = sorted.map(([persona, puntos], i) => 
+                        '<div class="ranking-item">' +
+                            '<span class="ranking-position">' + (i + 1) + '.</span>' +
+                            '<span class="ranking-name">' + persona + '</span>' +
+                            '<span class="ranking-points">' + puntos + ' pts</span>' +
+                        '</div>'
+                    ).join('');
                     
                     // Actualizar eventos
                     const events = document.getElementById('events');
-                    events.innerHTML = data.eventos.map(evento => \`
-                        <div class="event-item">
-                            <div class="event-author">\${evento.author}</div>
-                            <div class="event-amount">\${evento.amount}</div>
-                            <div class="event-persona">→ \${evento.persona} (+\${evento.puntos} pts)</div>
-                            <div class="event-message">\${evento.message}</div>
-                            <div class="event-time">\${evento.timestamp}</div>
-                        </div>
-                    \`).join('');
+                    events.innerHTML = data.eventos.map(evento => 
+                        '<div class="event-item">' +
+                            '<div class="event-author">' + evento.author + '</div>' +
+                            '<div class="event-amount">' + evento.amount + '</div>' +
+                            '<div class="event-persona">→ ' + evento.persona + ' (+' + evento.puntos + ' pts)</div>' +
+                            '<div class="event-message">' + evento.message + '</div>' +
+                            '<div class="event-time">' + evento.timestamp + '</div>' +
+                        '</div>'
+                    ).join('');
                     
                     // Actualizar estadísticas
                     const totalPuntos = Object.values(data.puntos).reduce((a, b) => a + b, 0);
                     document.getElementById('totalPuntos').textContent = totalPuntos;
                     document.getElementById('eventosHoy').textContent = data.eventos.length;
                     
+                    // Actualizar tabla diaria
+                    actualizarTablaDiaria(data.puntos_diarios);
+                    
                 } catch (error) {
                     console.error('Error:', error);
                     document.getElementById('ranking').innerHTML = '<div class="loading">Error cargando datos...</div>';
                 }
+            }
+            
+            function actualizarTablaDiaria(puntosDiarios) {
+                const dailyTable = document.getElementById('dailyTable');
+                
+                if (!puntosDiarios || Object.keys(puntosDiarios).length === 0) {
+                    dailyTable.innerHTML = '<div class="loading">No hay datos diarios disponibles</div>';
+                    return;
+                }
+                
+                // Obtener fechas ordenadas (más recientes primero)
+                const fechas = Object.keys(puntosDiarios).sort((a, b) => new Date(b) - new Date(a));
+                
+                // Crear tabla
+                let tablaHTML = '<div class="table-container"><table>';
+                
+                // Encabezados
+                tablaHTML += '<thead><tr>';
+                tablaHTML += '<th>Fecha</th>';
+                tablaHTML += '<th>Crazy</th>';
+                tablaHTML += '<th>Crucita</th>';
+                tablaHTML += '<th>Gigi</th>';
+                tablaHTML += '<th>Luise</th>';
+                tablaHTML += '<th>Carlos</th>';
+                tablaHTML += '<th>Giuseppe</th>';
+                tablaHTML += '<th>Karola</th>';
+                tablaHTML += '<th>Total</th>';
+                tablaHTML += '</tr></thead><tbody>';
+                
+                // Filas de datos
+                fechas.forEach(fecha => {
+                    const datos = puntosDiarios[fecha];
+                    const total = Object.values(datos).reduce((a, b) => a + b, 0);
+                    
+                    tablaHTML += '<tr>';
+                    tablaHTML += '<td class="date-cell">' + fecha + '</td>';
+                    tablaHTML += '<td class="points-cell">' + (datos.Crazy || 0) + '</td>';
+                    tablaHTML += '<td class="points-cell">' + (datos.Crucita || 0) + '</td>';
+                    tablaHTML += '<td class="points-cell">' + (datos.Gigi || 0) + '</td>';
+                    tablaHTML += '<td class="points-cell">' + (datos.Luise || 0) + '</td>';
+                    tablaHTML += '<td class="points-cell">' + (datos['Carlos Montesquieu'] || 0) + '</td>';
+                    tablaHTML += '<td class="points-cell">' + (datos.Giuseppe || 0) + '</td>';
+                    tablaHTML += '<td class="points-cell">' + (datos.Karola || 0) + '</td>';
+                    tablaHTML += '<td class="total-cell">' + total + '</td>';
+                    tablaHTML += '</tr>';
+                });
+                
+                tablaHTML += '</tbody></table></div>';
+                dailyTable.innerHTML = tablaHTML;
             }
             
             // Actualizar cada 3 segundos

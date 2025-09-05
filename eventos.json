@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "author": "Rochelle",
+    "amount": "$9.99",
+    "message": "$9.99 from Rochelle: \"#TEAMCRUSITA NO PODEMOS BAJARLE💚💚💚💚🫡🫡🫡🔥🔥🔥🔥\"",
+    "persona": "Crucita",
+    "puntos": 10,
+    "timestamp": "2025-09-05 03:53:21"
+  },
+  {
+    "id": 2,
+    "author": "Dahiana Escoto",
+    "amount": "$4.99",
+    "message": "$4.99 from Dahiana Escoto: \"Crusita\"",
+    "persona": "Crucita",
+    "puntos": 5,
+    "timestamp": "2025-09-05 03:53:21"
+  },
+  {
+    "id": 3,
+    "author": "Liz",
+    "amount": "$19.99",
+    "message": "$19.99 from Liz: \"CRUSITA sube esa cabeza en alto y no dejes q nadie apague tu brillo Tienes un grupo q te respalda y estamos muy orgullosos d ti Disfruta tus días y no le prestes atención al bugarrón d la casa que ese no da ni para tu sombra\"",
+    "persona": "Crucita",
+    "puntos": 20,
+    "timestamp": "2025-09-05 03:53:21"
+  },
+  {
+    "id": 4,
+    "author": "281288wilson",
+    "amount": "$4.99",
+    "message": "$4.99 from 281288wilson: \"TEAM GIGi prende la candela 🔥🔥🔥🔥\"",
+    "persona": "Gigi",
+    "puntos": 5,
+    "timestamp": "2025-09-05 03:53:21"
+  },
+  {
+    "id": 5,
+    "author": "angelijulissa1983",
+    "amount": "NOK 100.00",
+    "message": "NOK 100.00 from angelijulissa1983: \"Devuelvan los 6000 puntos a Gigi 💕 porque otros los han hecho peor y no le hacen nada solo a Gigi.\"",
+    "persona": "Gigi",
+    "puntos": 100,
+    "timestamp": "2025-09-05 03:53:21"
+  },
+  {
+    "id": 6,
+    "author": "Shely Nunez",
+    "amount": "$9.99",
+    "message": "$9.99 from Shely Nunez: \"TEAM CRUSITAAAA 🫶🏼🫶🏼\"",
+    "persona": "Crucita",
+    "puntos": 10,
+    "timestamp": "2025-09-05 03:53:21"
+  },
+  {
+    "id": 7,
+    "author": "Rip_thegoatakira ",
+    "amount": "$50.00",
+    "message": "$50.00 from Rip_thegoatakira : \"team crucita\"",
+    "persona": "Crucita",
+    "puntos": 50,
+    "timestamp": "2025-09-05 03:53:21"
+  },
+  {
+    "id": 8,
+    "author": "Nati Rodriguez ",
+    "amount": "$399.99",
+    "message": "$399.99 from Nati Rodriguez : \"TEAM GIGI ! YA SABEMOS Q ESE PRIMER LUGAR ESTÁ COMPRADO POR LA GENTE DE LA SANTA VICTIMA. PERO TRANQUILA MI GIGI ,PORQUE DIOS NO PREMIA AL INJUSTO MUCHO MENOS LA MALDADES . PARA TODOS TU YA ERES LA GANADORA ESCOGÍDA NO COMPRADA. DIOS ESTÁ CONTIGO. EN UN MUNDO DE ODIO SE TU LA PRESIÓN 😘\"",
+    "persona": "Gigi",
+    "puntos": 400,
+    "timestamp": "2025-09-05 03:53:21"
+  }
+]
