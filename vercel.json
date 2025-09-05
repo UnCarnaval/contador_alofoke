@@ -12,6 +12,12 @@
       "dest": "server.js"
     }
   ],
+  "crons": [
+    {
+      "path": "/api/monitorear",
+      "schedule": "*/30 * * * * *"
+    }
+  ],
   "env": {
     "NODE_ENV": "production",
     "API_KEY": "AIzaSyDCwPogQQkb0JIfWU2H8-l6_0XXyTSaC50",
