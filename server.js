@@ -78,10 +78,33 @@ async function sincronizarConDB() {
         const eventos = loadData(EVENTOS_FILE);
         const puntosDiarios = loadData(PUNTOS_DIARIOS_FILE);
         
-        // Actualizar puntos en la DB externa
-        await axios.post(`${DB_API_URL}?action=actualizar_puntos`, {
-            puntos: puntos
-        });
+        // Obtener puntos actuales de la DB externa
+        const datosDB = await obtenerDatosDeDB();
+        
+        if (datosDB && datosDB.puntos) {
+            // Sumar puntos locales a los de la DB externa
+            const puntosCombinados = {};
+            PARTICIPANTES.forEach(participante => {
+                const puntosLocales = puntos[participante] || 0;
+                const puntosDB = datosDB.puntos[participante] || 0;
+                puntosCombinados[participante] = puntosLocales + puntosDB;
+            });
+            
+            // Actualizar puntos combinados en la DB externa
+            await axios.post(`${DB_API_URL}?action=actualizar_puntos`, {
+                puntos: puntosCombinados
+            });
+            
+            // Actualizar archivos locales con los puntos combinados
+            saveData(PUNTOS_FILE, puntosCombinados);
+            
+            console.log('✅ Puntos combinados y sincronizados:', puntosCombinados);
+        } else {
+            // Si no hay datos en DB externa, usar solo los locales
+            await axios.post(`${DB_API_URL}?action=actualizar_puntos`, {
+                puntos: puntos
+            });
+        }
         
         // Actualizar puntos diarios en la DB externa
         await axios.post(`${DB_API_URL}?action=actualizar_puntos_diarios`, {
@@ -103,6 +126,38 @@ async function obtenerDatosDeDB() {
     } catch (error) {
         console.error('❌ Error obteniendo datos de DB externa:', error.message);
         return null;
+    }
+}
+
+// Restaurar puntos desde la base de datos externa
+async function restaurarPuntosDesdeDB() {
+    try {
+        console.log('🔄 Restaurando puntos desde base de datos externa...');
+        
+        const datosDB = await obtenerDatosDeDB();
+        
+        if (datosDB && datosDB.puntos) {
+            // Restaurar puntos desde la DB externa
+            saveData(PUNTOS_FILE, datosDB.puntos);
+            
+            // Restaurar eventos si existen
+            if (datosDB.eventos && datosDB.eventos.length > 0) {
+                saveData(EVENTOS_FILE, datosDB.eventos);
+            }
+            
+            // Restaurar puntos diarios si existen
+            if (datosDB.puntos_diarios && Object.keys(datosDB.puntos_diarios).length > 0) {
+                saveData(PUNTOS_DIARIOS_FILE, datosDB.puntos_diarios);
+            }
+            
+            console.log('✅ Puntos restaurados desde DB externa:', datosDB.puntos);
+            return true;
+        }
+        
+        return false;
+    } catch (error) {
+        console.error('❌ Error restaurando puntos desde DB externa:', error.message);
+        return false;
     }
 }
 
@@ -264,7 +319,7 @@ function guardarSuperChat(author, amount, message, personas, puntos) {
         
         eventos.push(nuevoEvento);
         
-        // Actualizar puntos
+        // Actualizar puntos (sumar a los existentes)
         puntosData[persona] = (puntosData[persona] || 0) + puntosPorPersona;
         
         // Actualizar puntos diarios
@@ -444,6 +499,33 @@ app.get('/api/monitorear', async (req, res) => {
         res.status(500).json({ 
             success: false, 
             message: 'Error en monitoreo',
+            error: error.message 
+        });
+    }
+});
+
+// API para restaurar puntos desde la base de datos externa
+app.get('/api/restaurar', async (req, res) => {
+    try {
+        const restaurado = await restaurarPuntosDesdeDB();
+        
+        if (restaurado) {
+            res.json({ 
+                success: true, 
+                message: 'Puntos restaurados correctamente desde la base de datos externa',
+                timestamp: getRDTime()
+            });
+        } else {
+            res.status(404).json({ 
+                success: false, 
+                message: 'No se pudieron restaurar los puntos desde la base de datos externa'
+            });
+        }
+    } catch (error) {
+        console.error('Error restaurando puntos:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error restaurando puntos',
             error: error.message 
         });
     }
@@ -818,6 +900,11 @@ app.get('/api/monitorear', async (req, res) => {
 
 // Inicializar archivos
 initFiles();
+
+// Restaurar puntos desde DB externa al iniciar
+setTimeout(async () => {
+    await restaurarPuntosDesdeDB();
+}, 2000); // Esperar 2 segundos para que se inicialicen los archivos
 
 // Programar monitoreo cada 30 segundos
 cron.schedule('*/30 * * * * *', monitorearSuperChats);
