@@ -11,6 +11,9 @@ const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.API_KEY || "AIzaSyDCwPogQQkb0JIfWU2H8-l6_0XXyTSaC50";
 const VIDEO_ID = process.env.VIDEO_ID || "gOJvu0xYsdo";
 
+// Configuración de base de datos externa
+const DB_API_URL = process.env.DB_API_URL || "https://blacklist11.altervista.org/api/superchats/index.php";
+
 // Participantes
 const PARTICIPANTES = ["Crazy", "Crucita", "Gigi", "Luise", "Carlos Montesquieu", "Giuseppe", "Karola"];
 
@@ -64,6 +67,43 @@ function getRDTime() {
     const now = new Date();
     const rdTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Santo_Domingo"}));
     return rdTime.toISOString().replace('T', ' ').substring(0, 19);
+}
+
+// Sincronizar datos con base de datos externa
+async function sincronizarConDB() {
+    try {
+        console.log('🔄 Sincronizando con base de datos externa...');
+        
+        const puntos = loadData(PUNTOS_FILE);
+        const eventos = loadData(EVENTOS_FILE);
+        const puntosDiarios = loadData(PUNTOS_DIARIOS_FILE);
+        
+        // Actualizar puntos en la DB externa
+        await axios.post(`${DB_API_URL}?action=actualizar_puntos`, {
+            puntos: puntos
+        });
+        
+        // Actualizar puntos diarios en la DB externa
+        await axios.post(`${DB_API_URL}?action=actualizar_puntos_diarios`, {
+            puntos_diarios: puntosDiarios
+        });
+        
+        console.log('✅ Datos sincronizados con base de datos externa');
+        
+    } catch (error) {
+        console.error('❌ Error sincronizando con DB externa:', error.message);
+    }
+}
+
+// Obtener datos de la base de datos externa
+async function obtenerDatosDeDB() {
+    try {
+        const response = await axios.get(`${DB_API_URL}?action=datos`);
+        return response.data;
+    } catch (error) {
+        console.error('❌ Error obteniendo datos de DB externa:', error.message);
+        return null;
+    }
 }
 
 // Cargar datos
@@ -239,6 +279,23 @@ function guardarSuperChat(author, amount, message, personas, puntos) {
     saveData(EVENTOS_FILE, eventos);
     saveData(PUNTOS_FILE, puntosData);
     
+    // Guardar evento en base de datos externa
+    personas.forEach(async (persona) => {
+        try {
+            await axios.post(`${DB_API_URL}?action=guardar_evento`, {
+                author: author,
+                amount: amount,
+                message: message,
+                persona: persona,
+                puntos: puntosPorPersona,
+                timestamp: getRDTime(),
+                personas_mencionadas: personas.length > 1 ? personas : undefined
+            });
+        } catch (error) {
+            console.error('❌ Error guardando evento en DB externa:', error.message);
+        }
+    });
+    
     const personasStr = personas.length > 1 ? ` (${personas.join(', ')})` : '';
     console.log(`✅ Super Chat guardado: ${author} - ${amount} → ${personasStr} (+${puntosPorPersona} puntos c/u)`);
     
@@ -344,25 +401,42 @@ app.use(express.json());
 app.use(express.static('public'));
 
 // API para obtener datos
-app.get('/api/datos', (req, res) => {
-    const puntos = loadData(PUNTOS_FILE);
-    const eventos = loadData(EVENTOS_FILE);
-    const puntosDiarios = loadData(PUNTOS_DIARIOS_FILE);
-    
-    res.json({
-        puntos,
-        eventos: eventos.slice(0, 20), // Solo los últimos 20 eventos
-        puntos_diarios: puntosDiarios
-    });
+app.get('/api/datos', async (req, res) => {
+    try {
+        // Intentar obtener datos de la base de datos externa primero
+        const datosDB = await obtenerDatosDeDB();
+        
+        if (datosDB) {
+            res.json(datosDB);
+        } else {
+            // Fallback a archivos locales
+            const puntos = loadData(PUNTOS_FILE);
+            const eventos = loadData(EVENTOS_FILE);
+            const puntosDiarios = loadData(PUNTOS_DIARIOS_FILE);
+            
+            res.json({
+                puntos,
+                eventos: eventos.slice(0, 20), // Solo los últimos 20 eventos
+                puntos_diarios: puntosDiarios
+            });
+        }
+    } catch (error) {
+        console.error('Error en /api/datos:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
 // API para monitorear manualmente (útil para Vercel cron)
 app.get('/api/monitorear', async (req, res) => {
     try {
         await monitorearSuperChats();
+        
+        // Sincronizar con base de datos externa
+        await sincronizarConDB();
+        
         res.json({ 
             success: true, 
-            message: 'Monitoreo ejecutados correctamente',
+            message: 'Monitoreo ejecutado correctamente y sincronizado con DB externa',
             timestamp: getRDTime()
         });
     } catch (error) {
@@ -747,6 +821,9 @@ initFiles();
 
 // Programar monitoreo cada 30 segundos
 cron.schedule('*/30 * * * * *', monitorearSuperChats);
+
+// Programar sincronización con DB externa cada minuto
+cron.schedule('* * * * *', sincronizarConDB);
 
 // Iniciar servidor
 app.listen(PORT, () => {
