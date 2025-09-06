@@ -82,26 +82,12 @@ async function sincronizarConDB() {
         const datosDB = await obtenerDatosDeDB();
         
         if (datosDB && datosDB.puntos) {
-            // Sumar puntos locales a los de la DB externa
-            const puntosCombinados = {};
-            PARTICIPANTES.forEach(participante => {
-                const puntosLocales = puntos[participante] || 0;
-                const puntosDB = datosDB.puntos[participante] || 0;
-                puntosCombinados[participante] = puntosLocales + puntosDB;
-            });
-            
-            // Actualizar puntos combinados en la DB externa
-            await axios.post(`${DB_API_URL}?action=actualizar_puntos`, {
-                puntos: puntosCombinados
-            });
-            
-            // Actualizar archivos locales con los puntos combinados
-            saveData(PUNTOS_FILE, puntosCombinados);
-            
-            console.log('✅ Puntos combinados y sincronizados:', puntosCombinados);
+            // Usar los puntos de la DB externa como fuente de verdad
+            saveData(PUNTOS_FILE, datosDB.puntos);
+            console.log('✅ Puntos sincronizados desde DB externa:', datosDB.puntos);
         } else {
             // Si no hay datos en DB externa, usar solo los locales
-            await axios.post(`${DB_API_URL}?action=actualizar_puntos`, {
+            await axios.post(`${DB_API_URL}?action=establecer_puntos`, {
                 puntos: puntos
             });
         }
@@ -345,6 +331,11 @@ function guardarSuperChat(author, amount, message, personas, puntos) {
                 puntos: puntosPorPersona,
                 timestamp: getRDTime(),
                 personas_mencionadas: personas.length > 1 ? personas : undefined
+            });
+            
+            // Sumar puntos en la DB externa
+            await axios.post(`${DB_API_URL}?action=actualizar_puntos`, {
+                puntos: { [persona]: puntosPorPersona }
             });
         } catch (error) {
             console.error('❌ Error guardando evento en DB externa:', error.message);
